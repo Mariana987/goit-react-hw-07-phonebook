@@ -11,10 +11,6 @@ import {
 export const contactItems = createReducer([], {
     [fetchContacts.fulfilled]: (_, { payload }) => payload,
     [addContact.fulfilled]: (state, { payload }) => {
-        if (state.some(({ name }) => name === payload.name)) {
-            alert(`Sorry, ${payload.name} is already in yours contacts list`);
-            return state;
-        }
         return [payload, ...state];
     },
     [deleteContact.fulfilled]: (state, { payload }) =>
@@ -41,15 +37,5 @@ export default combineReducers({
     filter,
     loadingProcess,
 });
-
-
-
-
-
-
-
-
-
-
 
 

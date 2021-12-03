@@ -3,7 +3,7 @@ import { connect } from 'react-redux';
 import { changeFilter } from '../../redux/Phonebook/phonebook-actions';
 import style from './Filter.module.css';
 
-function Filter({ filter, changeFilter }) {
+const Filter = ({ filter, changeFilter }) => {
     return (
         <label>
             Find contacts by name:

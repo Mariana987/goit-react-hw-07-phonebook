@@ -1,14 +1,20 @@
 
 import s from './ContactList.module.css'
 import PropTypes from 'prop-types';
-import { connect } from 'react-redux';
+import { connect, useSelector } from 'react-redux';
 import { useEffect } from 'react';
 import {
     deleteContact,
     fetchContacts,
 } from '../../redux/Phonebook/phonebook-operation';
+import Loader from "../Loader/Loader";
+import {
+    getLoading
+} from '../../redux/Phonebook/selectors';
 
 const ContactList = ({ contacts, deleteContact, fetchContactsAll }) => {
+    const isLoading = useSelector(getLoading);
+
     useEffect(() => {
         fetchContactsAll();
     }, [fetchContactsAll]);
@@ -16,6 +22,7 @@ const ContactList = ({ contacts, deleteContact, fetchContactsAll }) => {
     return (
         <>
             <ul >
+                {isLoading && <Loader />}
                 {contacts.map(({ id, name, number }) => (
                     <li key={id} className={s.item}>
                         <div><p>{name}</p>
@@ -41,15 +48,18 @@ ContactList.propTypes = {
     deleteContact: PropTypes.func.isRequired,
 };
 
-const filteredContacts = (allContacts, filter) => {
-    return allContacts.filter(({ name }) =>
-        name.toLocaleLowerCase().includes(filter.toLocaleLowerCase()),
+
+const getFilteredContacts = (allContacts, filter) => {
+    const normalizedFilter = filter.toLowerCase();
+    return allContacts.filter((contact) =>
+        contact.name.toLowerCase().includes(normalizedFilter),
     );
 };
 
-const mapStateToProps = ({ contacts: { contactItems, filter } }) => ({
-    contacts: filteredContacts(contactItems, filter),
-});
+const mapStateToProps = ({
+    contacts: { contactItems, filter } }) => ({
+        contacts: getFilteredContacts(contactItems, filter),
+    });
 
 const mapDispatchToProps = dispatch => ({
     deleteContact: id => dispatch(deleteContact(id)),

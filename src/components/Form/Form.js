@@ -1,15 +1,20 @@
 import { useState } from "react";
-import { useDispatch, connect } from "react-redux";
+import { useDispatch, connect, useSelector } from "react-redux";
 import { addContact } from "../../redux/Phonebook/phonebook-operation";
 import s from "./Form.module.css";
 import shortid from "shortid";
 
+import { getContacts } from "../../redux/Phonebook/selectors";
+
+
 function Form() {
 
-    const [name, setName] = useState("");
+    const [userName, setName] = useState("");
     const [number, setNumber] = useState("");
     const [active] = useState(false);
     const dispatch = useDispatch();
+    const contacts = useSelector(getContacts);
+
 
     const handleChange = (e) => {
         const { name, value } = e.target;
@@ -22,20 +27,33 @@ function Form() {
                 break;
             default:
                 console.warn(`Field - ${name} is under constraction`);
+                return
         }
     };
 
     const handleSubmit = (e) => {
         e.preventDefault();
-        dispatch(addContact({ name, number }));
-        resetForm();
+        const newContacts = {
+            name: userName,
+            number: number,
+            id: shortid.generate(),
+        };
+        if (contacts.find((contact) => contact.name === userName)) {
+            alert(`Sorry, ${userName} is already in yours contacts list`);
+
+            reset();
+            return
+        }
+
+
+        dispatch(addContact(newContacts));
+        reset();
     };
 
-    const resetForm = () => {
+    const reset = () => {
         setName("");
         setNumber("");
     };
-
     return (
         <form onSubmit={handleSubmit}>
             <label >
@@ -44,7 +62,7 @@ function Form() {
                     type="text"
                     id={shortid.generate()}
                     name="name"
-                    value={name}
+                    value={userName}
                     pattern="^[a-zA-Zа-яА-Я]+(([' -][a-zA-Zа-яА-Я ])?[a-zA-Zа-яА-Я]*)*$"
                     required
                     onChange={handleChange}
